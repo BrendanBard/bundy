@@ -1,9 +1,9 @@
 # Config
 $Username = "genera70"
 $Password = "123Buttercup!"
-$LocalFile = "C:\Temp\test.txt"
-$RemoteFile = "ftp://generalkenobi.x10host.com/public_html/test.txt"
- 
+$LocalFile = "$env:temp\ErrorLog.txt"
+$RemoteFile = "ftp://generalkenobi.x10host.com/public_html/ErrorLog.txt"
+
 # Create FTP Rquest Object
 $FTPRequest = [System.Net.FtpWebRequest]::Create("$RemoteFile")
 $FTPRequest = [System.Net.FtpWebRequest]$FTPRequest
