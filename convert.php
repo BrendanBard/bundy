@@ -2,7 +2,7 @@
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 $fh = fopen('data.txt','w'); //File to write to
-$fs = fopen('tester.txt', 'r'); //File to retrieve from
+$fs = fopen('ErrorLog.txt', 'r'); //File to retrieve from
 while ($line = fgets($fs)) {
 
 	$decnum = intval($line);
@@ -404,7 +404,7 @@ header('Location: data.php');
 
 else{
 ?>
-<!doctype html>
+<!--<!doctype html>
 <html>
 <style>
 .btnSubmit {
@@ -419,4 +419,4 @@ else{
 <input type="submit" name="submit" value="Submit" class="btnSubmit">
 </form>
 </body>
-</html><?php } ?>
+</html>--><?php } ?>
